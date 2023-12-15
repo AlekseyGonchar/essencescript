@@ -1,0 +1,125 @@
+[project]
+name = "essencescript"
+version = "0.1.0"
+description = ""
+authors = [{ name = "Alexey Gonchar", email = "tumberum@gmail.com" }]
+dependencies = [
+    "httpx>=0.25.0",
+    "uvicorn>=0.23.2",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.2",
+    "pydantic>=2.5.0",
+    "orjson>=3.9.10",
+    "pydantic-xml[lxml]>=2.4.0",
+    "datamodel-code-generator>=0.23.0",
+    "openapi-python-client>=0.15.2",
+    "attrs>=23.1.0",
+    "python-dateutil>=2.8.2",
+    "aenum>=3.1.15",
+    "jsonpath-ng>=1.6.0",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.black]
+line-length = 120
+target-version = ['py311']
+
+[tool.ruff]
+# Use all RUFF rules
+select = ['ALL']
+ignore = [
+    # Overlapping rules
+    'D211',
+    'D213',
+    # Docstring missing errors
+    'D10',
+    # Untyped 'self'
+    'ANN101',
+    'ANN102',
+]
+# Allow auto-fix for all fixable problems
+fixable = ['ALL']
+exclude = [
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".venv",
+    "__pypackages__",
+    "build",
+    "venv",
+]
+line-length = 120
+target-version = "py311"
+
+[tool.pdm.scripts]
+format = { cmd = "black .", help = "Format project files" }
+format-check = { cmd = "black . --check", help = "Check formatting" }
+lint = { cmd = "ruff check .", help = "Validate codestyle rules" }
+lint-fix = { cmd = "ruff check . --fix", help = "Automaticaly fix found codestyle issues" }
+check = { cmd = "mypy .", help = "Validate project types" }
+test = { cmd = "pytest", help = "Run tests" }
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "mypy>=1.6.1",
+    "ruff>=0.1.1",
+    "black>=23.10.0",
+    "pytest>=7.4.2",
+    "pytest-mock>=3.12.0",
+    "ipython>=8.16.1",
+    "types-beautifulsoup4>=4.12.0.7",
+    "lxml-stubs>=0.4.0",
+]
+[tool.ruff.per-file-ignores]
+# Ignore:
+# - S10 assert usage in tests
+# - ARG001 - unused fixtures
+"test_*.py" = ["S10", "ARG001", "PLR0913"]
+"fake_*.py" = ["S10", "ARG002", "ANN401", "PLR0913"]
+"conftest.py" = ["S10"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    "*.egg",
+    ".eggs",
+    "dist",
+    "build",
+    "docs",
+    ".tox",
+    ".git",
+    "__pycache__",
+]
+# Fail pytest run if test marked as "SHOULD FAIL(XFAIL)" for some reason passes (XPASS)
+xfail_strict = true
+testpaths = ["tests/"]
+# Default pytest CLI options used for each run
+# Non-obvious options:
+# `-r a` - Add more info to summary about failures (group tests by failures, errors, skips etc.)
+# `-n auto` - set number of workers for xdist plugin to auto, determined by PSUTIL as CPU count
+addopts = """ \
+    -r a \
+    --verbose \
+    --tb=short \
+    --code-highlight=yes \
+    --strict-markers \
+    --strict-config \
+    --doctest-modules \
+     -p no:randomly \
+"""
+env_files = [".test.env"]
+asyncio_mode = "auto"
